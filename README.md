@@ -21,3 +21,6 @@ None
 
 ### OUTPUTS
 None
+
+
+Notes: I wrote and tested this on a Windows 10 machine with Powershell 5.1. It might not work for you! I am sorry :( This is my first "public" script so let me know what doesn't work and we can try to fix it.
