@@ -215,4 +215,9 @@ foreach ($bond in $bonds){
 }
 
 # Finally, we export the container object to the specified destination.
-$bonds | export-csv $outputCSV -NoTypeInformation -Append
+try {
+    $bonds | export-csv $outputCSV -NoTypeInformation -Append
+}
+catch {
+    Throw "Had a problem exporting the CSV, unfortunately."
+}
