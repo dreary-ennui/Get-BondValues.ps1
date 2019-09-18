@@ -175,8 +175,12 @@ $header = @{
     "Upgrade-Insecure-Requests"="1"
 }
 
-$webRequest = Invoke-WebRequest -uri $uri -SessionVariable session -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
-
+try {
+    $webRequest = Invoke-WebRequest -uri $uri -SessionVariable session -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.132 Safari/537.36"
+}
+catch {
+    throw "Error initiating web request."
+}
 #endregion
 
 # Here we loop through each bond in the CSV, make the request, parse the response, and then add the results back to the original bond object.
