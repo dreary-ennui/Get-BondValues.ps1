@@ -216,8 +216,3 @@ foreach ($bond in $bonds){
 
 # Finally, we export the container object to the specified destination.
 $bonds | export-csv $outputCSV -NoTypeInformation -Append
-
-
-
-
-
