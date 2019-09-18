@@ -25,8 +25,27 @@
 #>
 
 param(
+    [Parameter(Mandatory=$true)]
+    [ValidateScript({
+        if ($_ -match "\d\d\/\d\d\d\d"){
+            $true
+        }
+        else {
+            Throw "$_ is not in proper format dd/yyyy."
+        }
+    })]
     [string]$redemptionDate,
+    [Parameter(Mandatory=$true)]
+    [ValidateScript({
+        if (Test-Path $_){
+            $true
+        }
+        else{
+            throw "InputCSV file not found."
+        }
+    })]
     [string]$inputCSV,
+    [Parameter(Mandatory=$true)]
     [string]$outputCSV
 )
 
@@ -67,14 +86,19 @@ function Get-BondValues{
         "Version" = "6" 
     }
 
-    # Make the web call.
-    $result = Invoke-WebRequest -Uri $uri -method Post -Body $formFields -ContentType "application/x-www-form-urlencoded" -Headers $header -WebSession $session
+    try {
+        # Make the web call.
+        $result = Invoke-WebRequest -Uri $uri -method Post -Body $formFields -ContentType "application/x-www-form-urlencoded" -Headers $header -WebSession $session
 
-    # If you input valid information, the website will tell you the data in a table called bnddata. I'm going to parse that out.
-    $table = @($result.ParsedHtml.getElementsByClassName("bnddata"))
-    
-    # If you input invalid information, the website will tell you what's wrong. I'll capture that and tell you what happened in your outputCSV in the "Note" column.
-    $errors = @($result.ParsedHtml.getElementsByClassName("errormessage"))
+        # If you input valid information, the website will tell you the data in a table called bnddata. I'm going to parse that out.
+        $table = @($result.ParsedHtml.getElementsByClassName("bnddata"))
+        
+        # If you input invalid information, the website will tell you what's wrong. I'll capture that and tell you what happened in your outputCSV in the "Note" column.
+        $errors = @($result.ParsedHtml.getElementsByClassName("errormessage"))
+    }
+    catch {
+        $returnVar = "The following error(s) have occurred:General error making web request or interpreting the HTML returned."
+    }
 
     if ($errors.count -ge 1){
         $returnVar = $errors.textcontent
@@ -122,8 +146,19 @@ function Get-BondValues{
     return $returnVar
 }
 
+
 # Load the CSV into the primary bonds object
 $bonds = import-csv $inputCSV
+
+# Validate that the imported CSV matches our expectations. 
+$expectedHeaders = "DateIssued","Denomination","Serial","Series"
+$csvHeaders = $bonds | get-member -MemberType NoteProperty | Select-Object -ExpandProperty name
+foreach ($header in $csvHeaders){
+    if ($header -notin $expectedHeaders){
+        throw "Your inputCSV contains invalid headers. Please provide only Serial, Series, Denomination, and DateIssued for each bond."
+    }
+}
+
 
 #region Establishes initial web session
 $uri = "https://www.treasurydirect.gov/BC/SBCPrice"
@@ -176,5 +211,9 @@ foreach ($bond in $bonds){
 }
 
 # Finally, we export the container object to the specified destination.
-$bonds | export-csv $outputCSV -NoTypeInformation
+$bonds | export-csv $outputCSV -NoTypeInformation -Append
+
+
+
+
 
