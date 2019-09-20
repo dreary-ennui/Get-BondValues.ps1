@@ -186,7 +186,7 @@ catch {
 # Here we loop through each bond in the CSV, make the request, parse the response, and then add the results back to the original bond object.
 foreach ($bond in $bonds){
     
-    $bond.dateissued = get-date $bond.dateissued -Format "MM/yyyy"
+    $bond.dateissued = Get-Date $bond.dateissued -Format "MM/yyyy"
 
     $result = Get-BondValues -redemptionDate $redemptionDate -series $bond.series -denomination $bond.denomination -serialnumber $bond.serial -dateIssued $bond.dateissued
 
