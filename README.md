@@ -8,7 +8,7 @@ Calling the script from the command line, provide it a date of redemption, an in
 .\Get-BondValues.ps1 -redemptionDate "01/2009" -inputCSV ".\inputCSV_Example.csv" -outputCSV ".\outputCSV_Example.csv"
 
 ### PARAMETER redemptionDate
-String. Provide the date of redemption in the format "mm/yyyy". Each bond's values will be calculated according to this date. This is the "Value as of:" field on the website.
+String. Provide the date of redemption in the format "MM/yyyy". Each bond's values will be calculated according to this date. This is the "Value as of:" field on the website.
 
 ### PARAMETER inputCSV
 String. Provide a CSV with fields Serial, Series, Denomination, and DateIssued for each bond.
